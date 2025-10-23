@@ -1,0 +1,43 @@
+{
+    "name": "ROS 2 Humble - Gazebo Fortress",
+    "build": {
+        "dockerfile": "../Dockerfile.fortress",
+        "tag": "ros2-humble-gazebo-fortress:dev"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cmake-tools",
+                "ms-iot.vscode-ros",
+                "twxs.cmake",
+                "redhat.vscode-xml",
+                "streetsidesoftware.code-spell-checker",
+                "eamodio.gitlens",
+                "ms-python.black-formatter",
+                "ms-python.flake8"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "python.defaultInterpreterPath": "/usr/bin/python3",
+                "python.linting.enabled": true,
+                "python.linting.flake8Enabled": true,
+                "python.formatting.provider": "black",
+                "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+                "cmake.configureOnOpen": false
+            }
+        }
+    },
+    "runArgs": [
+        "--name=ros2-fortress-dev",
+        "--network=host",
+        "-e", "DISPLAY=host.docker.internal:0.0",
+        "-e", "LIBGL_ALWAYS_INDIRECT=0"
+    ],
+    "workspaceMount": "source=${localWorkspaceFolder}/workspace,target=/root/ros2_ws/src,type=bind",
+    "workspaceFolder": "/root/ros2_ws",
+    "postCreateCommand": "cd /root/ros2_ws && rosdep update"
+}
