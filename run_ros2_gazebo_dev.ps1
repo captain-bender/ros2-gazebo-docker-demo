@@ -1,4 +1,4 @@
-docker run -it --rm `
+docker run -it `
   -e DISPLAY=host.docker.internal:0.0 `
   -e LIBGL_ALWAYS_INDIRECT=0 `
   --name ros2_humble_gazebo_dev `
