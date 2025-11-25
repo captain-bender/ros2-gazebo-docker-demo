@@ -21,6 +21,12 @@ RUN apt-get update && apt-get install -y \
     cmake \
     gdb \
     clang-format \
+    ros-humble-ros2-control \
+    ros-humble-ros2-controllers \
+    ros-humble-gazebo-ros2-control \
+    ros-humble-twist-mux \
+    ros-humble-twist-stamper \
+    ros-humble-ros-gz-image \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages for development
