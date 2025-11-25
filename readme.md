@@ -37,7 +37,10 @@ A complete Docker-based development environment for ROS 2 Humble with Gazebo For
 docker build -f Dockerfile.fortress -t ros2-humble-gazebo-fortress:dev .
 ```
 
-### 3. Open in VS Code
+### 3. Start the container
+For the first time run the ps1 file and start your container in the powershell. When you want to terminate its operation press CTRL+D.
+
+The next time you can just open it directly in VS code
 
 1. Open this folder in VS Code
 2. Press `F1` or `Ctrl+Shift+P`
@@ -45,8 +48,6 @@ docker build -f Dockerfile.fortress -t ros2-humble-gazebo-fortress:dev .
 4. Wait for container to build and start
 
 You're now inside the container!
-
-Otherwise, you can run the ps1 file and start your container in the powershell. When you want to terminate its operation press CTRL+D.
 
 ## Usage
 
