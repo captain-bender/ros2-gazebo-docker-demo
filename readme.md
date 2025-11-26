@@ -27,7 +27,7 @@ A complete Docker-based development environment for ROS 2 Humble with Gazebo For
 2. Configure settings:
    - Display: **Multiple windows**, Display number: **0**
    - Client startup: **Start no client**
-   - Extra settings: **☑ Disable access control** (Important!)
+   - Extra settings: **Disable access control** (Important!)
 3. Click Finish
 4. **Keep VcXsrv running** (you'll see it in system tray)
 5. Select to save the configuration, and next time double-click to the config file in order to start automatically.
