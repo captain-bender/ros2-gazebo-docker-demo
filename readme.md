@@ -38,16 +38,25 @@ docker build -f Dockerfile.fortress -t ros2-humble-gazebo-fortress:dev .
 ```
 
 ### 3. Start the container
-For the first time run the ps1 file and start your container in the powershell. When you want to terminate its operation press CTRL+D.
+For the first time run the ps1 file (run_ros2_gazebo_dev.ps1) and start your container in the powershell. When you want to terminate its operation press CTRL+D.
 
-The next time you can just open it directly in VS code
+The next time you can just start and stop it using the actions (play and stop) from the Docker Desktop app.
+![](./screenshots/docker-desktop1.png)
+
+Then you can open it directly in VS code
 
 1. Open this folder in VS Code
 2. Press `F1` or `Ctrl+Shift+P`
 3. Type: **"Dev Containers: Reopen in Container"**
 4. Wait for container to build and start
 
+Or select the remote explorer tab, find the container and attach it in the current window
+![](./screenshots/vscode1.png)
+
 You're now inside the container!
+
+To close the connection, click first in the lower left button and then "close remote connection" from the main menu.
+![](./screenshots/vscode2.png) 
 
 ## Usage
 
