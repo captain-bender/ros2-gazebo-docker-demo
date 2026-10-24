@@ -10,7 +10,9 @@ Once you're set up, see **[USAGE.md](./USAGE.md)** for your first package, Gazeb
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with WSL2 backend)
 - [VcXsrv Windows X Server](https://sourceforge.net/projects/vcxsrv/)
 - [Visual Studio Code](https://code.visualstudio.com/)
-- VS Code extension: [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- VS Code extension: [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) (`ms-vscode-remote.remote-containers`)
+  - In VS Code, open the Extensions view (`Ctrl+Shift+X`), search for **Dev Containers** (publisher: Microsoft) and click **Install**
+  - This is the only extension you install yourself. The ROS, Python and C++ extensions are installed automatically inside the container.
 
 ## What's Included
 
