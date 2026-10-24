@@ -20,6 +20,7 @@ A complete Docker-based development environment for ROS 2 Humble with Gazebo For
 - **VS Code Integration** - Seamless development experience with IntelliSense
 
 ## Quick Start
+Your ROS 2 packages go in workspace/ on Windows. Inside the container it appears as /root/ros2_ws/src.
 
 ### 1. Setup X Server (VcXsrv)
 
@@ -38,25 +39,24 @@ docker build -f Dockerfile.fortress -t ros2-humble-gazebo-fortress:dev .
 ```
 
 ### 3. Start the container
-For the first time run the ps1 file (run_ros2_gazebo_dev.ps1) and start your container in the powershell. When you want to terminate its operation press CTRL+D.
-
-The next time you can just start and stop it using the actions (play and stop) from the Docker Desktop app.
-![](./screenshots/docker-desktop1.png)
-
-Then you can open it directly in VS code
-
+**Option A (recommended): VS Code**
 1. Open this folder in VS Code
-2. Press `F1` or `Ctrl+Shift+P`
-3. Type: **"Dev Containers: Reopen in Container"**
-4. Wait for container to build and start
+2. Press `F1` → **Dev Containers: Reopen in Container**
+3. The first build takes several minutes. After that, VS Code reuses the same container.
 
-Or select the remote explorer tab, find the container and attach it in the current window
-![](./screenshots/vscode1.png)
+**Option B: terminal only**
+Run `run_ros2_gazebo_dev.ps1` from this folder (see the note below). Exit with `Ctrl+D`.
+Next time, start and stop it from Docker Desktop, or attach to it from VS Code's Remote Explorer.
 
-You're now inside the container!
+> Use one option or the other. To switch, first remove the old container:
+> `docker rm -f ros2_humble_gazebo_dev`
 
-To close the connection, click first in the lower left button and then "close remote connection" from the main menu.
-![](./screenshots/vscode2.png) 
+> Run it from the repository folder:
+> ```powershell
+> cd path\to\ros2-gazebo-docker-demo
+> powershell -ExecutionPolicy Bypass -File .\run_ros2_gazebo_dev.ps1
+> ```
+> This allows the script to run for this one call only; it doesn't change any system settings.
 
 ## Usage
 
@@ -78,26 +78,24 @@ ign gazebo --version
 ```
 
 ### Creating Your First Package
-```bash
-# Navigate to source directory
-cd src
+# Navigate to the source directory
+cd /root/ros2_ws/src
 
-# Create a Python package
-ros2 pkg create --build-type ament_python my_robot_package --dependencies rclpy
+# Create a Python package with a starter node
+ros2 pkg create --build-type ament_python --node-name my_node my_robot_package --dependencies rclpy
 
-# Or create a C++ package
-ros2 pkg create --build-type ament_cmake my_robot_cpp --dependencies rclcpp
+# Or a C++ package with a starter node
+ros2 pkg create --build-type ament_cmake --node-name my_node my_robot_cpp --dependencies rclcpp
 
 # Build the workspace
-cd ..
+cd /root/ros2_ws
 colcon build
 
 # Source the workspace
 source install/setup.bash
 
-# Run your node
+# Run your node (prints "Hi from my_robot_package.")
 ros2 run my_robot_package my_node
-```
 
 ### Working with Gazebo Fortress
 ```bash
@@ -122,19 +120,27 @@ ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="shapes.sdf"
 
 ### Gazebo-ROS Bridge
 
-The `ros_gz` bridge connects Gazebo and ROS 2:
+`gz_sim.launch.py` starts Gazebo but does **not** bridge any topics.
+Bridges are created explicitly with `ros_gz_bridge`.
+
 ```bash
-# Launch Gazebo with automatic ROS 2 bridge
-ros2 launch ros_gz_sim gz_sim.launch.py
+# Terminal 1: launch a world
+ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="shapes.sdf"
 
-# See bridged topics
-ros2 topic list
+# Terminal 2: bridge the clock (Gazebo → ROS 2)
+ros2 run ros_gz_bridge parameter_bridge "/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock"
 
-# Example: Subscribe to clock
+# Terminal 3: check it
 ros2 topic echo /clock
+```
 
-# Create entity from ROS 2
-ros2 run ros_gz_sim create -world default -file model.sdf
+Bridge syntax: `/topic@ROS_type<direction>Gazebo_type`, where
+`[` = Gazebo → ROS, `]` = ROS → Gazebo, `@` = both directions.
+
+```bash
+# Spawn a model into the running world.
+# -world must match the world name (shapes.sdf → "shapes", empty.sdf → "empty")
+ros2 run ros_gz_sim create -world shapes -name my_model -file /path/to/model.sdf
 ```
 
 ### Common Ignition Commands
