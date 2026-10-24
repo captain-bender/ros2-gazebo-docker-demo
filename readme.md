@@ -1,6 +1,8 @@
 # ROS 2 Humble with Gazebo Fortress - Docker Development Environment
 
-A complete Docker-based development environment for ROS 2 Humble with Gazebo Fortress (the new Gazebo), optimized for Windows 11 with VS Code integration.
+A Docker-based development environment for ROS 2 Humble with Gazebo Fortress (the new Gazebo), set up for Windows 11 with VS Code integration.
+
+Once you're set up, see **[USAGE.md](./USAGE.md)** for your first package, Gazebo, the ROS–Gazebo bridge and common commands.
 
 ## Prerequisites
 
@@ -8,192 +10,119 @@ A complete Docker-based development environment for ROS 2 Humble with Gazebo For
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with WSL2 backend)
 - [VcXsrv Windows X Server](https://sourceforge.net/projects/vcxsrv/)
 - [Visual Studio Code](https://code.visualstudio.com/)
-- VS Code Extension: [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- VS Code extension: [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
-## Features
+## What's Included
 
-- **ROS 2 Humble Desktop Full** - Complete ROS 2 installation
-- **Gazebo Fortress** - Next-generation Gazebo simulator (formerly Ignition Gazebo)
-- **ROS-Gazebo Bridge** - Seamless ROS 2 ↔ Gazebo integration
-- **RViz2** - 3D visualization tool
-- **Full Development Tools** - Git, CMake, GDB, Python linting/formatting
-- **VS Code Integration** - Seamless development experience with IntelliSense
+- **ROS 2 Humble Desktop Full** - complete ROS 2 installation, including RViz2 and rqt
+- **Gazebo Fortress** - the new Gazebo simulator (formerly Ignition Gazebo)
+- **ros_gz** - ROS 2 ↔ Gazebo bridge, plus `ign_ros2_control` and `ros2_controllers`
+- **Development tools** - Git, CMake, GDB, colcon, rosdep, Black, Flake8
+- **VS Code integration** - extensions and settings are installed automatically in the container
+
+## Where Your Code Lives
+
+Put your ROS 2 packages in the `workspace/` folder of this repository. Inside the container the same folder appears as `/root/ros2_ws/src`, so your code stays on Windows even if the container is removed.
+
+```
+ros2-gazebo-docker-demo/
+├── workspace/          →  /root/ros2_ws/src   (your packages)
+├── Dockerfile.fortress
+├── .devcontainer/
+├── run_ros2_gazebo_dev.ps1
+└── config.xlaunch      (saved VcXsrv settings)
+```
 
 ## Quick Start
-Your ROS 2 packages go in workspace/ on Windows. Inside the container it appears as /root/ros2_ws/src.
 
-### 1. Setup X Server (VcXsrv)
+### 1. Start the X Server (VcXsrv)
 
-1. Launch **XLaunch** from Start menu (or install from [SourceForge](https://sourceforge.net/projects/vcxsrv/))
+The container shows its windows (Gazebo, RViz2) through VcXsrv, so it must be running first.
+
+**Quickest way:** double-click `config.xlaunch` in this repository. It starts VcXsrv with the settings below.
+
+**Or configure it manually:**
+
+1. Launch **XLaunch** from the Start menu
 2. Configure settings:
    - Display: **Multiple windows**, Display number: **0**
    - Client startup: **Start no client**
    - Extra settings: **Disable access control** (Important!)
-3. Click Finish
-4. **Keep VcXsrv running** (you'll see it in system tray)
-5. Select to save the configuration, and next time double-click to the config file in order to start automatically.
+3. Click **Finish**
+4. **Keep VcXsrv running** (you'll see it in the system tray)
 
-### 2. Build Docker Image
-```bash
-docker build -f Dockerfile.fortress -t ros2-humble-gazebo-fortress:dev .
-```
+### 2. Start the Container
 
-### 3. Start the container
-**Option A (recommended): VS Code**
+Use **one** of the two options below.
+
+#### Option A (recommended): VS Code
+
 1. Open this folder in VS Code
-2. Press `F1` → **Dev Containers: Reopen in Container**
-3. The first build takes several minutes. After that, VS Code reuses the same container.
+2. Press `F1` (or `Ctrl+Shift+P`) → **Dev Containers: Reopen in Container**
+3. The first time, the image is built automatically. This takes several minutes. After that, VS Code reuses the same container.
 
-**Option B: terminal only**
-Run `run_ros2_gazebo_dev.ps1` from this folder (see the note below). Exit with `Ctrl+D`.
-Next time, start and stop it from Docker Desktop, or attach to it from VS Code's Remote Explorer.
+You're now inside the container. Open a terminal in VS Code (`` Ctrl+` ``) to start working.
 
-> Use one option or the other. To switch, first remove the old container:
-> `docker rm -f ros2_humble_gazebo_dev`
+To leave, click the green button in the lower-left corner and choose **Close Remote Connection**.
 
-> Run it from the repository folder:
+![](./screenshots/vscode2.png)
+
+#### Option B: Terminal only
+
+1. Build the image (first time only):
+   ```powershell
+   docker build -f Dockerfile.fortress -t ros2-humble-gazebo-fortress:dev .
+   ```
+2. Run the start script **from the repository folder**:
+   ```powershell
+   cd path\to\ros2-gazebo-docker-demo
+   powershell -ExecutionPolicy Bypass -File .\run_ros2_gazebo_dev.ps1
+   ```
+   `-ExecutionPolicy Bypass` lets the script run for this one call only; it doesn't change any system settings.
+3. Exit with `Ctrl+D`.
+
+Next time, start and stop the container from Docker Desktop:
+
+![](./screenshots/docker-desktop1.png)
+
+You can also open it in VS Code from the **Remote Explorer** tab by attaching to the running container:
+
+![](./screenshots/vscode1.png)
+
+> **Don't mix the two options.** Both create a container called `ros2_humble_gazebo_dev`. To switch, first remove the old one:
 > ```powershell
-> cd path\to\ros2-gazebo-docker-demo
-> powershell -ExecutionPolicy Bypass -File .\run_ros2_gazebo_dev.ps1
+> docker rm -f ros2_humble_gazebo_dev
 > ```
-> This allows the script to run for this one call only; it doesn't change any system settings.
+> Your code in `workspace/` is not affected.
 
-## Usage
+### 3. Check It Works
 
-### Testing the Setup
+In a terminal inside the container:
 
-Open a terminal in VS Code and test:
 ```bash
-# Test X server connection
+# X server connection: a clock window should appear
 xclock
 
-# Launch RViz2
+# RViz2
 rviz2
 
-# Launch Gazebo Fortress (GUI)
-ign gazebo
+# Gazebo Fortress GUI
+ign gazebo shapes.sdf
 
-# Check Gazebo version
+# Gazebo version
 ign gazebo --version
 ```
 
-### Creating Your First Package
-# Navigate to the source directory
-cd /root/ros2_ws/src
+If no window appears, check that VcXsrv is running (step 1).
 
-# Create a Python package with a starter node
-ros2 pkg create --build-type ament_python --node-name my_node my_robot_package --dependencies rclpy
+## Next Steps
 
-# Or a C++ package with a starter node
-ros2 pkg create --build-type ament_cmake --node-name my_node my_robot_cpp --dependencies rclcpp
+Continue with **[USAGE.md](./USAGE.md)**:
 
-# Build the workspace
-cd /root/ros2_ws
-colcon build
-
-# Source the workspace
-source install/setup.bash
-
-# Run your node (prints "Hi from my_robot_package.")
-ros2 run my_robot_package my_node
-
-### Working with Gazebo Fortress
-```bash
-# Launch empty world
-ign gazebo empty.sdf
-
-# Launch with shapes demo
-ign gazebo shapes.sdf
-
-# Launch with verbosity (debugging)
-ign gazebo -v 4
-
-# List available fuel models
-ign fuel list -t model
-
-# Launch with ROS 2 integration
-ros2 launch ros_gz_sim gz_sim.launch.py
-
-# Launch specific world with ROS 2
-ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="shapes.sdf"
-```
-
-### Gazebo-ROS Bridge
-
-`gz_sim.launch.py` starts Gazebo but does **not** bridge any topics.
-Bridges are created explicitly with `ros_gz_bridge`.
-
-```bash
-# Terminal 1: launch a world
-ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="shapes.sdf"
-
-# Terminal 2: bridge the clock (Gazebo → ROS 2)
-ros2 run ros_gz_bridge parameter_bridge "/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock"
-
-# Terminal 3: check it
-ros2 topic echo /clock
-```
-
-Bridge syntax: `/topic@ROS_type<direction>Gazebo_type`, where
-`[` = Gazebo → ROS, `]` = ROS → Gazebo, `@` = both directions.
-
-```bash
-# Spawn a model into the running world.
-# -world must match the world name (shapes.sdf → "shapes", empty.sdf → "empty")
-ros2 run ros_gz_sim create -world shapes -name my_model -file /path/to/model.sdf
-```
-
-### Common Ignition Commands
-```bash
-# Launch Gazebo GUI
-ign gazebo
-
-# List running simulations
-ign gazebo -l
-
-# Get help
-ign gazebo --help
-
-# Launch GUI client only (connect to running server)
-ign gazebo -g
-
-# Service list
-ign service -l
-
-# Topic list
-ign topic -l
-
-# Echo a topic
-ign topic -e -t /topic_name
-```
-
-### Common ROS 2 Commands
-```bash
-# List nodes
-ros2 node list
-
-# List topics
-ros2 topic list
-
-# Echo a topic
-ros2 topic echo /topic_name
-
-# Show topic info
-ros2 topic info /topic_name
-
-# Run rqt (graphical tools)
-rqt
-
-# View TF tree
-ros2 run tf2_tools view_frames
-```
-
-## Performance Tips
-
-- **Headless mode**: Run `ign gazebo -s` for simulation only, visualize with RViz2
-- **Reduce GUI load**: Use `-g` flag to run GUI client separately
-- **Optimize models**: Use simpler meshes and reduce sensor update rates
-- **Allocate resources**: Docker Desktop → Settings → Resources (4GB+ RAM recommended)
+- Creating and building your first package
+- Running Gazebo worlds
+- Bridging topics between Gazebo and ROS 2
+- Common commands and performance tips
 
 ## License
 
