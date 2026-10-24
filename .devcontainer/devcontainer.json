@@ -23,21 +23,21 @@
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
                 "python.defaultInterpreterPath": "/usr/bin/python3",
-                "python.linting.enabled": true,
-                "python.linting.flake8Enabled": true,
-                "python.formatting.provider": "black",
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.black-formatter",
+                    "editor.formatOnSave": true
+                },
                 "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
                 "cmake.configureOnOpen": false
             }
         }
     },
     "runArgs": [
-        "--name=ros2-fortress-dev",
-        "--network=host",
+        "--name=ros2_humble_gazebo_dev",
         "-e", "DISPLAY=host.docker.internal:0.0",
         "-e", "LIBGL_ALWAYS_INDIRECT=0"
     ],
     "workspaceMount": "source=${localWorkspaceFolder}/workspace,target=/root/ros2_ws/src,type=bind",
     "workspaceFolder": "/root/ros2_ws",
-    "postCreateCommand": "cd /root/ros2_ws && rosdep update"
+    "postCreateCommand": "rosdep update"
 }
